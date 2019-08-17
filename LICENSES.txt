@@ -22,3 +22,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+RUBBERY LICENSE
+---------------
+
+Rubbery is distributed under the GPL (Gnu Public License). I don't think i need
+to provide a specific license document but thanks to the rubbery guys for that
+little executable! Couldn't have done it without you guys. You can find the source
+code for rubberband here: https://breakfastquay.com/rubberband/
