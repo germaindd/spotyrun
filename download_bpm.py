@@ -1,6 +1,7 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import subprocess
+import re
 
 credentials = SpotifyClientCredentials("70aca742c29e4bf0b10705f38d99faa3", "2a73c2a476044f7b82f6771b1ed31c63")
 sp = spotipy.Spotify(client_credentials_manager=credentials)
@@ -48,6 +49,7 @@ def convert_bpm(tracks: list, target_bpm):
 
 
 def download_playlist(playlist_id, playlist_name: str):
+    """downloads the entire playlist in .wav format with spotdl (and options)"""
     subprocess.run(['spotdl', '--playlist', playlist_id], stdout=subprocess.PIPE)
     subprocess.run(['spotdl', '--list', '{}.txt'.format(playlist_name.replace(' ', '-')), '--overwrite', 'force',
                     '--file-format', '{track_name}', '--trim-silence', '--folder', OUTPUT_PATH, '--output-ext', '.wav'],
@@ -56,7 +58,7 @@ def download_playlist(playlist_id, playlist_name: str):
     print("\n------------------\nDownload finished\n------------------\n\n")
 
 
-def add_song_bpm(sp: spotipy.Spotify, tracks: list):
+def add_song_bpm_to_tracks(tracks: list):
     """adds song bpm to list of tracks"""
     ids = list(map(lambda track: track.id, tracks))
     features_list = sp.audio_features(ids)
@@ -82,12 +84,25 @@ def get_playlist_tracks(playlist_id):
     return tracks
 
 
+def get_playlist_id():
+    # get id from URI
+    playlist_input = input('enter spotify URI: ')
+    if 'spotify:playlist' in playlist_input:
+        playlist_id = playlist_input.split(':')[-1]
+    elif 'spotify.com/playlist' in playlist_input:
+        query = re.search("/playlist/(.+)$", playlist_input)
+        group1 = query.group(1)
+        playlist_id = group1.split('?')[0]
+    else:
+        playlist_id = playlist_input
+    return playlist_id
+
+
 def main():
     global OUTPUT_PATH
 
-    # get id from URI
-    playlist_id = input('enter spotify URI: ').split(':')[-1]
-    # get target bpm
+    playlist_id = get_playlist_id()
+
     target_bpm = input('enter target bpm: ')
     OUTPUT_PATH = input('enter path of folder to output to (or press enter for current directory): ')
 
@@ -98,12 +113,12 @@ def main():
 
     subprocess.run(['mkdir', OUTPUT_PATH])
 
-    playlist_dict = sp.get_playlist(playlist_id)
-    playlist_name = playlist_dict['name']
+    playlist_api_response = sp.get_playlist(playlist_id)
+    playlist_name = playlist_api_response['name']
 
     tracks = get_playlist_tracks(playlist_id)
 
-    add_song_bpm(sp, tracks)
+    add_song_bpm_to_tracks(sp, tracks)
 
     download_playlist(playlist_id, playlist_name)
 
