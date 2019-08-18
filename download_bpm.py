@@ -2,6 +2,8 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import subprocess
 import re
+import os
+import sys
 
 credentials = SpotifyClientCredentials("70aca742c29e4bf0b10705f38d99faa3", "2a73c2a476044f7b82f6771b1ed31c63")
 sp = spotipy.Spotify(client_credentials_manager=credentials)
@@ -40,12 +42,16 @@ def convert_bpm(tracks: list, target_bpm):
         if base_bpm < 100:
             base_bpm *= 2
 
-        print("adjusting bpm {} to bpm {}".format(track, target_bpm))
-        subprocess.run(['./rubberband', '--quiet', '--tempo', '{}:{}'.format(base_bpm, target_bpm),
+        print("adjusting bpm {} to bpm {} using rubberband".format(track, target_bpm))
+
+        path_to_executable = os.path.abspath(os.path.dirname(sys.argv[0]))
+        subprocess.run(['{}/rubberband'.format(path_to_executable), '--quiet', '--tempo', '{}:{}'.format(base_bpm, target_bpm),
                         "{}/{}".format(OUTPUT_PATH, filename), '{}/bpm_converted/{}'.format(OUTPUT_PATH, filename)])
+
         print("converting to mp3")
         subprocess.run(['ffmpeg', '-y', '-loglevel', 'level+error', '-i', '{}/bpm_converted/{}'.format(OUTPUT_PATH, filename),
                         '{}/bpm_converted/{}.mp3'.format(OUTPUT_PATH, track.track_name)])
+        print("\n")
 
 
 def download_playlist(playlist_id, playlist_name: str):
@@ -86,7 +92,7 @@ def get_playlist_tracks(playlist_id):
 
 def get_playlist_id():
     # get id from URI
-    playlist_input = input('enter spotify URI: ')
+    playlist_input = input('enter playlist link: ')
     if 'spotify:playlist' in playlist_input:
         playlist_id = playlist_input.split(':')[-1]
     elif 'spotify.com/playlist' in playlist_input:
@@ -118,9 +124,9 @@ def main():
 
     tracks = get_playlist_tracks(playlist_id)
 
-    add_song_bpm_to_tracks(sp, tracks)
+    add_song_bpm_to_tracks(tracks)
 
-    download_playlist(playlist_id, playlist_name)
+    # download_playlist(playlist_id, playlist_name)
 
     convert_bpm(tracks, target_bpm)
 
