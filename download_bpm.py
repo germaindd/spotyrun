@@ -126,7 +126,7 @@ def main():
 
     add_song_bpm_to_tracks(tracks)
 
-    # download_playlist(playlist_id, playlist_name)
+    download_playlist(playlist_id, playlist_name)
 
     convert_bpm(tracks, target_bpm)
 
