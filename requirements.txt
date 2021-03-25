@@ -8,7 +8,7 @@ lyricwikia==0.1.9
 mutagen==1.42.0
 pafy==0.5.4
 pathlib==1.0.1
-PyYAML==5.1.2
+PyYAML==5.4
 requests==2.22.0
 six==1.12.0
 soupsieve==1.9.2
